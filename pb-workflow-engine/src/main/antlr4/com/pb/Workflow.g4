@@ -33,11 +33,19 @@ AND		: 'and' ;
 OR		: 'or' ;
 
 //comparison grammar
-EQUAL	: '=' ;
+EQ	: '=' ;
 GT		: '>' ;
 GTE		: '>=' ;
 LT		: '<' ;
 LTE		: '<=' ;
+
+TRUE  : 'true' ;
+FALSE : 'false' ;
+
+MULT  : '*' ;
+DIV   : '/' ;
+PLUS  : '+' ;
+MINUS : '-' ;
 
 //  DECIMAL, IDENTIFIER, COMMENTS, WS are set using regular expressions
 
@@ -58,8 +66,9 @@ WS : [ \r\t\u000C\n]+ -> skip ;
 
 querySet	: singleQuery* EOF ;
 
-singleQuery	: START query+ RESULT result END SEMI 
-			| REPORT aggregationExpr FROM index_name FILTER filter_conditions* END SEMI ;
+singleQuery	: REPORT aggregationExpr FROM index_name FILTER filter_conditions* END SEMI
+            | REPORT aggregationExpr FROM index_name END SEMI
+            ;
 			
 aggregationExpr
 	: aggregation  
@@ -83,13 +92,50 @@ index_name
 filter_conditions
 	: filter_condition AND filter_condition		# FilterConditionAnd
 	| filter_condition OR filter_condition		# FilterConditionOr
+//	| comparison_expr                           # ComparisonExpression
+	| LPAREN filter_condition RPAREN            # FilterConditionInParen
+//	| logical_entity                            # LogicalEntity
 	| filter_condition							# FilterCondition
 	;
-	
+
 // filter condition tag to be added
 filter_condition
-	: IDENTIFIER
+    : comparison_expr                           # ComparisonExpression
+    | logical_entity                            # LogicalEntity
 	;
+
+comparison_expr : comparisonOperand comparisonOperator comparisonOperand
+                       # ComparisonExpressionWithOperator
+                | LPAREN comparison_expr RPAREN # ComparisonExpressionInParen
+                ;
+
+comparisonOperand : arithmetic_expr
+                   ;
+
+comparisonOperator  : GT
+                    | GTE
+                    | LT
+                    | LTE
+                    | EQ
+                    ;
+
+arithmetic_expr
+ : arithmetic_expr MULT arithmetic_expr  # ArithmeticExpressionMult
+ | arithmetic_expr DIV arithmetic_expr   # ArithmeticExpressionDiv
+ | arithmetic_expr PLUS arithmetic_expr  # ArithmeticExpressionPlus
+ | arithmetic_expr MINUS arithmetic_expr # ArithmeticExpressionMinus
+ | MINUS arithmetic_expr                 # ArithmeticExpressionNegation
+ | LPAREN arithmetic_expr RPAREN         # ArithmeticExpressionParens
+ | numeric_entity                        # ArithmeticExpressionNumericEntity
+ ;
+
+logical_entity : (TRUE | FALSE) # LogicalConst
+               | IDENTIFIER     # LogicalVariable
+               ;
+
+numeric_entity : DECIMAL              # NumericConst
+               | IDENTIFIER           # NumericVariable
+               ;
 
 //query	: query_expr ;
 result	: IDENTIFIER ;

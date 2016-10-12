@@ -80,4 +80,42 @@ public class WorkflowTreeBuilder extends WorkflowBaseListener {
         //System.out.println("exit expression variable");
         fieldsStack.push(ctx.getText());
     }
+
+    @Override public void exitFilterCondition(@NotNull WorkflowParser.FilterConditionContext ctx) {
+        System.out.println("exitFilterCondition");
+    }
+
+    @Override public void exitFilterConditionInParen(@NotNull WorkflowParser.FilterConditionInParenContext ctx) {
+        System.out.println("exitFilterConditionInParen");
+    }
+
+    @Override public void exitComparisonExpression(@NotNull WorkflowParser.ComparisonExpressionContext ctx) {
+        System.out.println("exitComparisonExpression - text = " + ctx.getText());
+    }
+
+    @Override public void enterComparisonExpressionWithOperator(
+        @NotNull WorkflowParser.ComparisonExpressionWithOperatorContext ctx) {
+        System.out.println("enterComparisonExpressionWithOperator - text = " + ctx.getText());
+    }
+
+    @Override public void exitComparisonExpressionWithOperator(
+        @NotNull WorkflowParser.ComparisonExpressionWithOperatorContext ctx) {
+        System.out.println("exitComparisonExpressionWithOperator - text = " + ctx.getText());
+    }
+
+    @Override public void enterComparisonOperand(@NotNull WorkflowParser.ComparisonOperandContext ctx) {
+        System.out.println("enterComparisonOperand - text = " + ctx.getText());
+    }
+
+    @Override public void exitComparisonOperand(@NotNull WorkflowParser.ComparisonOperandContext ctx) {
+        System.out.println("exitComparisonOperand - text = " + ctx.getText());
+    }
+
+    @Override public void enterComparisonOperator(@NotNull WorkflowParser.ComparisonOperatorContext ctx) {
+        System.out.println("enterComparisonOperator - text = " + ctx.getText());
+    }
+
+    @Override public void exitComparisonOperator(@NotNull WorkflowParser.ComparisonOperatorContext ctx) {
+        System.out.println("exitComparisonOperator - text = " + ctx.getText());
+    }
 }
