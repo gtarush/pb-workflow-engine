@@ -19,14 +19,14 @@ public class AfterExpression extends QueryExpression{
 	}
 
 	/**
-	 * @return the left
+	 * @return the leftOperand
 	 */
 	public QueryExpression getLeft() {
 		return left;
 	}
 
 	/**
-	 * @return the right
+	 * @return the rightOperand
 	 */
 	public QueryExpression getRight() {
 		return right;

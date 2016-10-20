@@ -1,43 +1,27 @@
-/**
- * 
- */
 package com.pb.workflow.domain;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
+ * This class is the main parent class to form a complete query.
  * @author Tarush Grover
  *
  */
 public class QuerySet implements IQuerySet{
 	
-	public final List<Query> queries;
-	
-	public Aggregation aggregation;
-	
-	/**
-	 * @param aggregation the aggregation to set
-	 */
-	public void setAggregation(Aggregation aggregation) {
-		this.aggregation = aggregation;
-	}
+	//public final List<Query> queries;
 
-	/**
-	 * @return the aggregation
-	 */
-	public Aggregation getAggregation() {
-		return aggregation;
-	}
+    @Getter
+    @Setter
+	private Aggregation aggregation;
 
 	public QuerySet(){
-		this.queries = new ArrayList<>();
-		this.aggregation = new Aggregation();
+		//this.queries = new ArrayList<>();
+		//this.aggregation = new Aggregation();
 	}
 	
-	public QuerySet(Collection<Query> queries){
+	/*public QuerySet(Collection<Query> queries){
 		this.queries = new ArrayList<>(queries);
 	}
 	
@@ -61,6 +45,6 @@ public class QuerySet implements IQuerySet{
 		
 		QuerySet querySet = (QuerySet)obj;
 		return this.queries.equals(querySet.queries);
-	}
+	}*/
 
 }

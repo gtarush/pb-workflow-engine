@@ -33,11 +33,12 @@ AND		: 'and' ;
 OR		: 'or' ;
 
 //comparison grammar
-EQ	: '=' ;
+EQ	    : '=' ;
 GT		: '>' ;
 GTE		: '>=' ;
 LT		: '<' ;
 LTE		: '<=' ;
+NE      : '!=' ;
 
 TRUE  : 'true' ;
 FALSE : 'false' ;

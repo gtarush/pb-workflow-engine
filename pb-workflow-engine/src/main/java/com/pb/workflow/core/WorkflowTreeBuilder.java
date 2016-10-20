@@ -12,18 +12,28 @@ import com.pb.WorkflowParser.AggregationExprContext;
 import com.pb.WorkflowParser.ExpressionVariableContext;
 import com.pb.WorkflowParser.QuerySetContext;
 import com.pb.WorkflowParser.SingleQueryContext;
+import com.pb.workflow.constants.Relation;
 import com.pb.workflow.domain.*;
 import org.antlr.v4.runtime.misc.NotNull;
 
 /**
  * @author Tarush Grover
  */
+@SuppressWarnings("all")
 public class WorkflowTreeBuilder extends WorkflowBaseListener {
 
     private QuerySet querySet = null;
     private Aggregation aggregation;
 
     private Stack<String> fieldsStack = new Stack<>();
+
+    private Stack<SearchComparisonExpression> comparisonExpressions = new Stack<>();
+
+    private SearchComparisonExpression searchComparisonExpression;
+
+    private SearchBinaryOperator searchBinaryOperator;
+
+    private Stack<SearchBinaryOperator> operators = new Stack<>();
 
     @Override
     public void enterQuerySet(QuerySetContext ctx) {
@@ -83,19 +93,19 @@ public class WorkflowTreeBuilder extends WorkflowBaseListener {
 
     @Override public void exitFilterCondition(@NotNull WorkflowParser.FilterConditionContext ctx) {
         System.out.println("exitFilterCondition");
+        // logic to package all filter conditions into one search query.
     }
 
     @Override public void exitFilterConditionInParen(@NotNull WorkflowParser.FilterConditionInParenContext ctx) {
         System.out.println("exitFilterConditionInParen");
     }
 
-    @Override public void exitComparisonExpression(@NotNull WorkflowParser.ComparisonExpressionContext ctx) {
-        System.out.println("exitComparisonExpression - text = " + ctx.getText());
+    @Override public void exitFilterConditionAnd(@NotNull WorkflowParser.FilterConditionAndContext ctx) {
+        System.out.println("exitFilterConditionAnd");
     }
 
-    @Override public void enterComparisonExpressionWithOperator(
-        @NotNull WorkflowParser.ComparisonExpressionWithOperatorContext ctx) {
-        System.out.println("enterComparisonExpressionWithOperator - text = " + ctx.getText());
+    @Override public void exitComparisonExpression(@NotNull WorkflowParser.ComparisonExpressionContext ctx) {
+        System.out.println("exitComparisonExpression - text = " + ctx.getText());
     }
 
     @Override public void exitComparisonExpressionWithOperator(
@@ -103,19 +113,52 @@ public class WorkflowTreeBuilder extends WorkflowBaseListener {
         System.out.println("exitComparisonExpressionWithOperator - text = " + ctx.getText());
     }
 
-    @Override public void enterComparisonOperand(@NotNull WorkflowParser.ComparisonOperandContext ctx) {
-        System.out.println("enterComparisonOperand - text = " + ctx.getText());
-    }
-
     @Override public void exitComparisonOperand(@NotNull WorkflowParser.ComparisonOperandContext ctx) {
         System.out.println("exitComparisonOperand - text = " + ctx.getText());
     }
 
-    @Override public void enterComparisonOperator(@NotNull WorkflowParser.ComparisonOperatorContext ctx) {
-        System.out.println("enterComparisonOperator - text = " + ctx.getText());
+    @Override public void exitComparisonOperator(@NotNull WorkflowParser.ComparisonOperatorContext ctx) {
+        /*System.out.println("exitComparisonOperator - text = " + ctx.getText());*/
+        if (!operators.isEmpty()) {
+            searchBinaryOperator = operators.pop();
+            searchBinaryOperator.setOperator(getRelation(ctx.getText()));
+            operators.push(searchBinaryOperator);
+            resetBinaryOperator();
+        }
     }
 
-    @Override public void exitComparisonOperator(@NotNull WorkflowParser.ComparisonOperatorContext ctx) {
-        System.out.println("exitComparisonOperator - text = " + ctx.getText());
+    private Relation getRelation(@NotNull String operator) {
+        Relation relation = null;
+        switch (operator) {
+            case "=":
+                relation = Relation.EQUAL;
+                break;
+            case ">":
+                relation = Relation.GREATER;
+                break;
+        }
+        return relation;
+    }
+
+    @Override public void exitNumericVariable(@NotNull WorkflowParser.NumericVariableContext ctx) {
+        if(operators.isEmpty()) {
+            searchBinaryOperator = new SearchBinaryOperator();
+            searchBinaryOperator.setLeftOperand(new Operand(ctx.getText()));
+            operators.push(searchBinaryOperator);
+            resetBinaryOperator();
+        } else {
+            searchBinaryOperator = operators.pop();
+            if (searchBinaryOperator.getLeftOperand() == null) {
+                searchBinaryOperator.setLeftOperand(new Operand(ctx.getText()));
+            } else {
+                searchBinaryOperator.setRightOperand(new Operand(ctx.getText()));
+            }
+            operators.push(searchBinaryOperator);
+            resetBinaryOperator();
+        }
+    }
+
+    private void resetBinaryOperator() {
+        this.searchBinaryOperator = null;
     }
 }

@@ -20,7 +20,7 @@ public class WorkflowApplication {
 	 */
 	public static void main(String[] args) {
         Compiler compiler = new Compiler();
-        QuerySet compile = compiler.compile("report count(color) from name filter (y > 0) end;");
+        QuerySet compile = compiler.compile("report count(color) from name filter (y > x) end;");
 
         //JSON serialization
         ObjectMapper mapper = new ObjectMapper();
