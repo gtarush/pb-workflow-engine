@@ -22,10 +22,10 @@ public class Compiler {
 //
 //        return treeBuilder.getQuerySet();
 //    }
-	
+
 	public QuerySet compile(String inputString) {
 		WorkflowParser parser = new WorkflowParser(
-				new CommonTokenStream(new WorkflowLexer(new ANTLRInputStream(inputString))));
+			new CommonTokenStream(new WorkflowLexer(new ANTLRInputStream(inputString))));
 		WorkflowTreeBuilder treeBuilder = new WorkflowTreeBuilder();
 		parser.addParseListener(treeBuilder);
 		parser.setErrorHandler(new ExceptionThrowingErrorHandler());
